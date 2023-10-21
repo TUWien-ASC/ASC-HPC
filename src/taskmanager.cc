@@ -3,9 +3,14 @@
 
 #include <concurrentqueue.h>
 
+#include "taskmanager.h"
+#include "timer.h"
 
 namespace ASC_HPC
 {
+
+  std::mutex output_mutex;
+  
   struct Task
   {
     int nr, size;
@@ -20,38 +25,56 @@ namespace ASC_HPC
   
   
   bool stop = false;
+  std::atomic<int> running{0};
   TQueue queue;
   
   
   void StartWorkers(size_t num)
   {
+    // if (!timeline)
+    // timeline = std::make_unique<TimeLine>();
+        
     stop = false;
     for (int i = 0; i < num; i++)
       {
-        std::thread([]()
-                    {
-                      TPToken ptoken(queue); 
-                      TCToken ctoken(queue); 
+        TimeLine * patl = timeline.get();
+        std::thread([patl]()
+        {
+          running++;
+          if (patl)
+            timeline = std::make_unique<TimeLine>();
+          
+          TPToken ptoken(queue); 
+          TCToken ctoken(queue); 
                       
-                      while(true)
-                        {
-                          if (stop) break;
+          while(true)
+            {
+              if (stop) break;
 
-                          Task task;
-                          if(!queue.try_dequeue_from_producer(ptoken, task)) 
-                            if(!queue.try_dequeue(ctoken, task))  
-                              continue; 
-                          
-                          (*task.pfunc)(task.nr, task.size);
-                          (*task.cnt)++;
-                        }
-                    }).detach();
+              Task task;
+              if(!queue.try_dequeue_from_producer(ptoken, task)) 
+                if(!queue.try_dequeue(ctoken, task))  
+                  continue; 
+              
+              (*task.pfunc)(task.nr, task.size);
+              (*task.cnt)++;
+            }
+
+          if (timeline)
+            {
+              TimeLine tmp = std::move(*timeline);
+              if (patl)
+                patl -> AddTimeLine(std::move(tmp));
+            }
+          running--;
+        }).detach();
       }
   }
 
   void StopWorkers()
   {
     stop = true;
+    while (running);
   }
 
   

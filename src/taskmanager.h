@@ -11,6 +11,8 @@ namespace ASC_HPC
   
   void RunParallel (size_t num,
                     const std::function<void(size_t nr, size_t size)> & func);
+
+  extern std::mutex output_mutex;
 }
 
 
