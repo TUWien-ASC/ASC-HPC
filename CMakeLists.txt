@@ -3,7 +3,9 @@ project(ASC_HPC)
 
 set (CMAKE_CXX_STANDARD 17)
 
-include_directories(src)
+include_directories(src concurrentqueue)
 
 
-add_executable (demo_tasks demos/demo_tasks.cc)
+add_executable (demo_tasks demos/demo_tasks.cc 
+                src/taskmanager.cc)
+
