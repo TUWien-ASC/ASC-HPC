@@ -8,4 +8,4 @@ include_directories(src concurrentqueue)
 
 add_executable (demo_tasks demos/demo_tasks.cc 
                 src/taskmanager.cc)
-
+target_sources (demo_tasks PUBLIC src/taskmanager.h)
