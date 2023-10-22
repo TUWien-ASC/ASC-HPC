@@ -12,8 +12,8 @@ int main()
   timeline = std::make_unique<TimeLine>("demo.trace");
 
   StartWorkers(3);
-
-  RunParallel(10,  [] (size_t i, size_t size)
+  
+  RunParallel(10, [] (size_t i, size_t size)
   {
     static Timer t("timer one");
     RegionTimer reg(t);
@@ -37,7 +37,6 @@ int main()
   RunParallel(100,  [] (size_t i, size_t size)
   {
     static Timer t("timer two", { 0, 0, 1});
-    extern int myvar; myvar++;
     RegionTimer reg(t);
   });
 

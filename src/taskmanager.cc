@@ -6,16 +6,26 @@
 #include "taskmanager.h"
 #include "timer.h"
 
+
 namespace ASC_HPC
 {
 
   std::mutex output_mutex;
+
   
-  struct Task
+  class Task
   {
+  public:
     int nr, size;
     const std::function<void(size_t nr, size_t size)> * pfunc;
     std::atomic<int> * cnt;
+
+    Task & operator++(int)
+    {
+      nr++;
+      return *this;
+    }
+    Task & operator*() { return *this; }
   };
 
   
@@ -85,6 +95,8 @@ namespace ASC_HPC
     TCToken ctoken(queue);
     
     std::atomic<int> cnt{0};
+
+    /*
     for (size_t i = 0; i < num; i++)
       {
         Task task;
@@ -94,12 +106,21 @@ namespace ASC_HPC
         task.cnt = & cnt;
         queue.enqueue (ptoken, task);
       }
+    */
+
+    Task firsttask;
+    firsttask.nr = 0;
+    firsttask.size = num;
+    firsttask.pfunc=&func;
+    firsttask.cnt = &cnt;
+    queue.enqueue_bulk (ptoken, firsttask, num);    
+
     
     while (cnt < num)
       {
         Task task;
         if(!queue.try_dequeue_from_producer(ptoken, task)) 
-          if(!queue.try_dequeue(ctoken, task))  
+          if(!queue.try_dequeue(ctoken, task))
             continue; 
         
         (*task.pfunc)(task.nr, task.size);
