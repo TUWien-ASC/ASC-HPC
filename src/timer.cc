@@ -24,14 +24,6 @@ namespace ASC_HPC
   
   TimeLine :: ~TimeLine()
   {
-    std::lock_guard<std::mutex> lock(output_mutex);
-    /*
-    if (subtl.size())
-      std::cout << "have sub-tls: " << subtl.size() << std::endl;
-    if (events.size())
-      Print (std::cout);
-    */
-    
     if (filename != "")
       {
         auto end_time = std::chrono::high_resolution_clock::now();

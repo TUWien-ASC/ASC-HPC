@@ -1,10 +1,12 @@
 #include <iostream>
 #include <sstream>
+
+
 #include <taskmanager.h>
 #include <timer.h>
 
 using namespace ASC_HPC;
-using namespace std;
+using std::cout, std::endl;
 
 
 int main()
@@ -13,7 +15,7 @@ int main()
 
   StartWorkers(3);
   
-  RunParallel(10, [] (size_t i, size_t size)
+  RunParallel(10, [] (int i, int size)
   {
     static Timer t("timer one");
     RegionTimer reg(t);
@@ -21,32 +23,32 @@ int main()
   });
 
   
-  RunParallel(6, [] (size_t i, size_t s)
+  RunParallel(6, [] (int i, int s)
   {
-    RunParallel(6, [i](size_t j, size_t s2)
+    RunParallel(6, [i] (int j, int s2)
     {
-        stringstream str;
-        str << "nested, i,j = " << i << "," << j << "\n";
-        cout << str.str();
+      std::stringstream str;
+      str << "nested, i,j = " << i << "," << j << "\n";
+      cout << str.str();
     });
   });
 
 
 
   
-  RunParallel(100,  [] (size_t i, size_t size)
+  RunParallel(100,  [] (int i, int size)
   {
     static Timer t("timer two", { 0, 0, 1});
     RegionTimer reg(t);
   });
 
-  RunParallel(1000,  [] (size_t i, size_t size)
+  RunParallel(1000,  [] (int i, int size)
   {
     static Timer t("timer 3", { 1, 0, 0});
     RegionTimer reg(t);
   });
 
-  RunParallel(100, [] (size_t i, size_t s)
+  RunParallel(100, [] (int i, int s)
   {
     static Timer t("timer 4", { 1, 1, 0});
     RegionTimer reg(t);    
