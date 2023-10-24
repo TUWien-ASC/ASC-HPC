@@ -32,4 +32,16 @@ int main()
   cout << "a = " << a << endl;
   cout << "b = " << b << endl;
   cout << "a+b = " << a+b << endl;
+
+  
+  auto sequ = IndexSequence<int64_t, 4>();
+  cout << "sequ = " << sequ << endl;
+  auto mask = (2 >= sequ);
+  cout << "2 >= " << sequ << " = " << mask << endl;
+
+  {
+    double a[] = { 10, 10, 10, 10 };
+    SIMD<double,4> sa(&a[0], mask);
+    cout << "sa = " << sa << endl;
+  }
 }

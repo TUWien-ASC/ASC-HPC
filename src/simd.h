@@ -28,6 +28,21 @@ namespace ASC_HPC
   }
 
   
+  class mask64
+  {
+    int64_t mask;
+  public:
+    mask64 (bool b)
+      : mask{ b ? -1 : 0 } { }
+    // auto Val() const { return mask; }
+    operator bool() { return bool(mask); }
+  };
+  
+  inline std::ostream & operator<< (std::ostream & ost, mask64 m)
+  {
+    ost << (m ? 't' : 'f');
+    return ost;
+  }
 
   namespace detail {
     template <typename T, size_t N, size_t... I>
@@ -47,6 +62,7 @@ namespace ASC_HPC
   template <typename T, size_t S>
   class SIMD
   {
+  protected:
     static constexpr size_t S1 = LargestPowerOfTwo(S-1);
     static constexpr size_t S2 = S-S1;
 
@@ -70,6 +86,13 @@ namespace ASC_HPC
     explicit SIMD (T val0, T2... vals)
       : SIMD(std::array<T, S>{val0, vals...}) { }
 
+    explicit SIMD (T * ptr)
+      : lo(ptr), hi(ptr+S1) { }
+    
+    explicit SIMD (T * ptr, SIMD<mask64,S> m)
+      : lo(ptr, m.Lo()), hi(ptr+S1, m.Hi()) { }
+    
+    
     static constexpr int Size() { return S; }    
     auto & Lo() { return lo; }
     auto & Hi() { return hi; }
@@ -88,11 +111,18 @@ namespace ASC_HPC
     SIMD() = default;
     SIMD(T _val) : val(_val) { }
     SIMD(std::array<T,1> vals) : val(vals[0]) { }
-    
+
+    explicit SIMD (T * ptr)
+      : val{*ptr} { } 
+
     auto Val() const { return val; }
+    
+    explicit SIMD (T * ptr, SIMD<mask64,1> m)
+      : val{ m.Val() ? *ptr : T(0)} { }
+
     constexpr size_t Size() { return 1; }
     const T * Ptr() const { return &val; }    
-    T operator[] (size_t i) const { return &val; }
+    T operator[] (size_t i) const { return val; }
   };
 
 
@@ -130,13 +160,47 @@ namespace ASC_HPC
   auto FMA(SIMD<T,1> a, SIMD<T,1> b, SIMD<T,1> c)
   { return SIMD<T,1> (a.Val()*b.Val()+c.Val()); }
   
+
+
+  
+  template <typename T, size_t S, size_t first=0>
+  class IndexSequence : public SIMD<T,S>
+  {
+    using SIMD<T,S>::S1;
+    using SIMD<T,S>::S2;
+  public:
+    IndexSequence()
+      : SIMD<T,S> (IndexSequence<T,S1,first>(),
+                   IndexSequence<T,S2,first+S1>())
+    { }
+  };
+
+  template <typename T, size_t first>
+  class IndexSequence<T,1,first> : public SIMD<T,1>
+  {
+  public:
+    IndexSequence() : SIMD<T,1> (first) { }
+  };
+
+
+  template <typename T, size_t S>
+  auto operator>= (SIMD<T,S> a, SIMD<T,S> b)
+  { return SIMD<mask64,S>(a.Lo()>=b.Lo(), a.Hi()>=b.Hi()); }
+
+  template <typename T>
+  auto operator>= (SIMD<T,1> a, SIMD<T,1> b)
+  { return SIMD<mask64,1>(a.Val()>=b.Val()); }
+
+  template <typename TA, typename T, size_t S>
+  auto operator>= (TA a, const SIMD<T,S> & b)
+  { return SIMD<T,S>(a) >= b; }
+  
 }
-
-
+  
 #endif
-
-
-
+  
+  
+  
 #ifdef __AVX__
 #include "simd_avx.h"
 #endif
