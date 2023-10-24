@@ -7,7 +7,7 @@
 using namespace ASC_HPC;
 using std::cout, std::endl;
 
-auto Func1 (SIMD<double,2> a, SIMD<double,2> b)
+auto Func1 (SIMD<double> a, SIMD<double> b)
 {
   return a+b;
 }

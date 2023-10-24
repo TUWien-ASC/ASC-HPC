@@ -9,7 +9,15 @@
 namespace ASC_HPC
 {
 
-  template <typename T, size_t S> class SIMD;
+
+#ifdef __AVX__
+  constexpr size_t DefaultSimdSizeBytes = 32;
+#else
+  constexpr size_t DefaultSimdSizeBytes = 16;
+#endif
+
+  
+  template <typename T, size_t S = DefaultSimdSizeBytes/sizeof(T)> class SIMD;
   
   
   constexpr size_t LargestPowerOfTwo (size_t x)
