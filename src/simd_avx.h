@@ -69,6 +69,15 @@ namespace ASC_HPC
   
 
 
+  template <int64_t first=0>
+  class IndexSequence<int64_t, 4, first> : public SIMD<int64_t,4>
+  {
+  public:
+    IndexSequence()
+      : SIMD<int64_t,4> (first, first+1, first+2, first+3) { }
+  };
+  
+
 
   
   inline auto operator+ (SIMD<double,4> a, SIMD<double,4> b) { return SIMD<double,4> (_mm256_add_pd(a.Val(), b.Val())); }
