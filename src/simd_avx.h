@@ -69,7 +69,7 @@ namespace ASC_HPC
   
 
 
-  template <int64_t first=0>
+  template <int64_t first>
   class IndexSequence<int64_t, 4, first> : public SIMD<int64_t,4>
   {
   public:
