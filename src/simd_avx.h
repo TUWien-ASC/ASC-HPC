@@ -12,7 +12,7 @@ namespace ASC_HPC
     __m256i mask;
   public:
     SIMD (__m256i _mask) : mask(_mask) { };
-    SIMD (__m256d _mask) : val(_mm256_castpd_si256(_mask)) { ; }
+    SIMD (__m256d _mask) : mask(_mm256_castpd_si256(_mask)) { ; }
     auto Val() const { return mask; }
   };
 
