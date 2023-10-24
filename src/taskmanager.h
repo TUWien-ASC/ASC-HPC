@@ -1,6 +1,7 @@
 #ifndef TASKMANAGER_H
 #define TASKMANAGER_H
 
+#include<functional>
 
 
 namespace ASC_HPC
