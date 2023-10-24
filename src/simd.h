@@ -163,7 +163,7 @@ namespace ASC_HPC
 
 
   
-  template <typename T, size_t S, size_t first=0>
+  template <typename T, size_t S, T first=0>
   class IndexSequence : public SIMD<T,S>
   {
     using SIMD<T,S>::S1;
@@ -175,7 +175,7 @@ namespace ASC_HPC
     { }
   };
 
-  template <typename T, size_t first>
+  template <typename T, T first>
   class IndexSequence<T,1,first> : public SIMD<T,1>
   {
   public:

@@ -26,6 +26,7 @@ namespace ASC_HPC
     SIMD (const SIMD &) = default;
     SIMD(double _val) : val{_mm256_set1_pd(_val)} {};
     SIMD(__m256d _val) : val{_val} {};
+    SIMD (__m256d _val) : val(_mm256_castpd_si256(_val)) { ; }
     SIMD (double v0, double v1, double v2, double v3) : val{_mm256_set_pd(v3,v2,v1,v0)} {  }
     SIMD (SIMD<double,2> v0, SIMD<double,2> v1) : SIMD(v0[0], v0[1], v1[0], v1[1]) { }  // can do better !
     SIMD (std::array<double,4> a) : SIMD(a[0],a[1],a[2],a[3]) { }
