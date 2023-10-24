@@ -26,7 +26,7 @@ namespace ASC_HPC
     auto Hi() const { return val[1]; }
   };
 
-  inline auto operator+ (SIMD<double,2> a, SIMD<double,2> b) { return SIMD<double,2> (a.Val()+b.Val()); }
+  inline auto operator+ (SIMD<double,2> a, SIMD<double,2> b) { std::cout<<"m1 add" << std::endl; return SIMD<double,2> (a.Val()+b.Val()); }
   inline auto operator- (SIMD<double,2> a, SIMD<double,2> b) { return SIMD<double,2> (a.Val()-b.Val()); }
   
   inline auto operator* (SIMD<double,2> a, SIMD<double,2> b) { return SIMD<double,2> (a.Val()*b.Val()); }

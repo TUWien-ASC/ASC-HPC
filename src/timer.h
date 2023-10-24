@@ -4,8 +4,13 @@
 #include<iostream>
 #include<string>
 #include<memory>
-
-
+#include <vector>
+#include <array>
+#include <chrono>
+#include <mutex>
+#include <thread>
+#include <functional>
+#include <algorithm>
 
 
 
