@@ -9,6 +9,10 @@ using namespace ASC_HPC;
 using namespace std;
 
 
+/*
+  useful functions for matrix-matrix multiplication with vector updates:
+  C_i* += Aij Bj* 
+ */
 
 // daxpy: y += alpha * x
 void daxpy (size_t n, double * px, double * py, double alpha)
@@ -22,8 +26,6 @@ void daxpy (size_t n, double * px, double * py, double alpha)
       yi.Store(py+i);
     }
 }
-
-
 
 // multi-daxpy:
 // y0 += alpha00 * x0 + alpha01 * x1
@@ -56,6 +58,11 @@ void daxpy2x2 (size_t n, double * px0, double * px1,
 }
 
 
+/*
+  useful functions for matrix-matrix multiplication with inner products:
+  C_iJ = sum* Ai* B*J       where J = ( j,j+1, ... j+SW-1 )
+ */
+
 // Inner product
 // x ... double vector
 // y ... simd vector, with dy distance in doubles
@@ -71,11 +78,32 @@ auto InnerProduct (size_t n, double * px, double * py, size_t dy)
   return sum;
 }
 
-
+// generate function to look at assembly code
 auto InnerProduct8 (size_t n, double * px, double * py, size_t dy)
 {
   return InnerProduct<8> (n, px, py, dy);
 }
+
+
+// Inner product
+// x0,x1 ... double vector
+// y ... simd vector, with dy distance in doubles
+template <size_t SW>
+auto InnerProduct2 (size_t n, double * px0, double * px1, double * py, size_t dy)
+{
+  SIMD<double,SW> sum0;
+  SIMD<double,SW> sum1;
+  for (size_t i = 0; i < n; i++)
+    {
+      // sum += px[i] * SIMD<double,SW>(py+i*dy);
+      SIMD<double,SW> yi(py+i*dy);
+      sum0 = FMA(SIMD<double,SW>(px0[i]), yi, sum0);
+      sum1 = FMA(SIMD<double,SW>(px1[i]), yi, sum1);      
+    }
+  return tuple(sum0, sum1);
+}
+
+
 
 
 int main()
@@ -149,7 +177,7 @@ int main()
   
 
   cout << "timing inner product" << endl;
-  constexpr size_t SW=8;
+  constexpr size_t SW=16;
   for (size_t n = 16; n <= 1024; n*= 2)
     {
       double * px = new double[n];
@@ -177,5 +205,45 @@ int main()
       delete [] py;
       delete [] px;
     }
+  
+  {
+  cout << "timing inner product2" << endl;
+  constexpr size_t SW=16;
+  for (size_t n = 16; n <= 1024; n*= 2)
+    {
+      double * px0 = new double[n];
+      double * px1 = new double[n];
+      double * py = new double[n*SW];
+      for (size_t i = 0; i < n; i++)
+        {
+          px0[i] = i;
+          px1[i] = 3+i;
+        }
+      for (size_t i = 0; i < n*SW; i++)
+        py[i] = 2;
+  
+      auto start = std::chrono::high_resolution_clock::now();
+
+      size_t runs = size_t (1e8 / (n*2*SW)) + 1;
+
+      SIMD<double,SW> sum{0.0};
+      for (size_t i = 0; i < runs; i++)
+        {
+          auto [sum0,sum1] = InnerProduct2<SW> (n, px0, px1, py, SW);
+          sum += sum0 + sum1;
+        }
+      
+      auto end = std::chrono::high_resolution_clock::now();
+      double time = std::chrono::duration<double, std::milli>(end-start).count();
+      cout << "sum = " << sum;
+      cout << ", n = " << n << ", time = " << time 
+           << " ms, GFlops = " << (2*SW*n*runs)/time/1e6
+           << endl;
+      
+      delete [] py;
+      delete [] px0;
+      delete [] px1;
+    }
+  }
   
 }
