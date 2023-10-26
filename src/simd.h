@@ -99,6 +99,16 @@ namespace ASC_HPC
 
     const T * Ptr() const { return lo.Ptr(); }
     T operator[] (size_t i) const { return Ptr()[i]; }
+
+    void Store (T * ptr) const {
+      lo.Store(ptr);
+      hi.Store(ptr+S1);
+    }
+
+    void Store (T * ptr, SIMD<mask64,S> m) const {
+      lo.Store(ptr, m.Lo());
+      hi.Store(ptr+S1, m.Hi());
+    }
   };
 
 
@@ -153,6 +163,9 @@ namespace ASC_HPC
   template <typename T>
   auto operator* (double a, SIMD<T,1> b) { return SIMD<T,1> (a*b.Val()); }
 
+  template <typename T, size_t S>
+  auto operator+= (SIMD<T,S> & a, SIMD<T,S> b) { a = a+b; return a; }
+  
   template <typename T, size_t S>
   auto FMA(SIMD<T,S> a, SIMD<T,S> b, SIMD<T,S> c)
   { return SIMD<T,S> (FMA(a.Lo(),b.Lo(),c.Lo()), FMA(a.Hi(),b.Hi(),c.Hi())); }    

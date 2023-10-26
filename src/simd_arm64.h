@@ -25,12 +25,25 @@ namespace ASC_HPC
 	val[0] = mask[0] ? p[0] : 0;
 	val[1] = mask[1] ? p[1] : 0;
       }
-    
+
+    static constexpr int Size() { return 2; }    
     auto Val() const { return val; }
     const double * Ptr() const { return (double*)&val; }
 
     auto Lo() const { return val[0]; }
     auto Hi() const { return val[1]; }
+    double operator[] (int i) const { return val[i]; }
+
+    void Store (double * p)
+    {
+      vst1q_f64(p, val);
+    }
+    
+    void Store (double * p, SIMD<mask64,2> mask)
+    {
+      if (mask[0]) p[0] = val[0];
+      if (mask[1]) p[1] = val[1];
+    }
   };
 
   inline auto operator+ (SIMD<double,2> a, SIMD<double,2> b) { return SIMD<double,2> (a.Val()+b.Val()); }
