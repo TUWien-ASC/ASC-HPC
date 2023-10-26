@@ -164,7 +164,6 @@ int main()
       size_t runs = size_t (1e8 / (n*SIMD<double,SW>::Size())) + 1;
 
       SIMD<double,SW> sum{0.0};
-      extern int myvar; myvar++;
       for (size_t i = 0; i < runs; i++)
         sum += InnerProduct<SW> (n, px, py, SIMD<double,SW>::Size());
       
