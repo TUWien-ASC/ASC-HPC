@@ -23,6 +23,27 @@ auto Func3 (SIMD<double,4> a, SIMD<double,4> b, SIMD<double,4> c)
 }
 
 
+auto Load (double * p)
+{
+  return SIMD<double,2>(p);
+}
+
+auto LoadMask (double * p, SIMD<mask64,2> m)
+{
+  return SIMD<double,2>(p, m);
+}
+
+auto TestSelect (SIMD<mask64,2> m, SIMD<double,2> a, SIMD<double,2> b)
+{
+  return Select (m, a, b);
+}
+
+SIMD<double,2> TestHSum (SIMD<double,4> a, SIMD<double,4> b)
+{
+  return HSum(a,b);
+}
+
+
 
 int main()
 {
