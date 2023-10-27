@@ -3,6 +3,13 @@
 
 #include <immintrin.h>
 
+
+/*
+  implementation of SIMDs for Intel-CPUs with AVX support:
+  https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html
+ */
+
+
 namespace ASC_HPC
 {
 
@@ -103,7 +110,8 @@ namespace ASC_HPC
 #endif
 
   inline SIMD<mask64,4> operator>= (SIMD<int64_t,4> a , SIMD<int64_t,4> b)
-  { return  _mm256_xor_si256(_mm256_cmpgt_epi64(b.Val(),a.Val()),_mm256_set1_epi32(-1)); }
+  { // there is no a>=b, so we return !(b>a)
+    return  _mm256_xor_si256(_mm256_cmpgt_epi64(b.Val(),a.Val()),_mm256_set1_epi32(-1)); }
   
   inline auto operator>= (SIMD<double,4> a, SIMD<double,4> b)
   { return SIMD<mask64,4>(_mm256_cmp_pd (a.Val(), b.Val(), _CMP_GE_OQ)); }

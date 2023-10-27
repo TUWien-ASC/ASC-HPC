@@ -3,6 +3,15 @@
 
 #include "arm_neon.h"
 
+/*
+  implementation of SIMDs for ARM-Neon CPUs:
+  https://arm-software.github.io/acle/neon_intrinsics/advsimd.html
+
+  // neon coding:
+  https://developer.arm.com/documentation/102159/0400
+*/
+
+
 namespace ASC_HPC
 {
 

@@ -174,6 +174,37 @@ namespace ASC_HPC
   { return SIMD<T,1> (a.Val()*b.Val()+c.Val()); }
 
 
+
+  // ****************** Horizontal sums *****************************
+  
+  template <typename T, size_t S>
+  auto HSum (SIMD<T,S> a) { return HSum(a.Lo())+HSum(a.Hi()); }
+
+  template <typename T>
+  auto HSum (SIMD<T,1> a) { return a.Val(); }
+  
+  
+  template <typename T, size_t S>
+  auto HSum (SIMD<T,S> a0, SIMD<T,S> a1)
+  { return HSum(a0.Lo(), a1.Lo())+HSum(a0.Hi(), a1.Hi()); }
+
+  template <typename T>
+  auto HSum(SIMD<T,1> a0, SIMD<T,1> a1)
+  { return SIMD<T,2> (a0.Val(), a1.Val()); }
+
+
+  
+  // ****************** Select   *************************************
+
+  template <typename T>
+  auto Select (SIMD<mask64,1> mask, SIMD<T,1> a, SIMD<T,1> b)
+  { return mask.Val() ? a : b; }
+  
+  template <typename T, size_t S>
+  auto Select (SIMD<mask64,S> mask, SIMD<T,S> a, SIMD<T,S> b)
+  { return SIMD<T,S> (Select (mask.Lo(), a.Lo(), b.Lo()),
+                      Select (mask.Hi(), a.Hi(), b.Hi())); }
+
   // ****************** IndexSequence ********************************
   
   template <typename T, size_t S, T first=0>
@@ -184,8 +215,7 @@ namespace ASC_HPC
   public:
     IndexSequence()
       : SIMD<T,S> (IndexSequence<T,S1,first>(),
-                   IndexSequence<T,S2,first+S1>())
-    { }
+                   IndexSequence<T,S2,first+S1>()) { }
   };
 
   template <typename T, T first>
@@ -220,57 +250,5 @@ namespace ASC_HPC
 #endif
 
 
-
-
-namespace ASC_HPC
-{
-
-  // ****************** Horizontal sums *****************************
-
-  inline double HSum(double a) { return a; }
-  
-  template <typename T, size_t S>
-  double HSum (SIMD<T,S> a)
-  {
-    if constexpr (S > 1)
-      return HSum(a.Lo())+HSum(a.Hi());
-    else
-      return a.Val();
-  }
-
-
-  inline SIMD<double,2> HSum(double a0, double a1) { return SIMD<double,2> (a0, a1); }
-  
-  template <typename T, size_t S>
-  auto HSum (SIMD<T,S> a0, SIMD<T,S> a1) -> SIMD<T,2>
-  {
-    if constexpr (S > 1)
-      return HSum(a0.Lo(), a1.Lo())+HSum(a0.Hi(), a1.Hi());
-    else
-      return SIMD<T,2> (a0.Val(), a1.Val());
-  }
-
-
-
-  
-  // ****************** Select   *************************************
-
-  template <typename T>
-  auto Select (SIMD<mask64,1> mask, SIMD<T,1> a, SIMD<T,2> b)
-  {
-    return mask.Val() ? a : b;
-  }
-
-  
-  template <typename T, size_t S>
-  auto Select (SIMD<mask64,S> mask, SIMD<T,S> a, SIMD<T,S> b)
-  {
-    if constexpr (S > 1)
-      return SIMD<T,S> ( Select (mask.Lo(), a.Lo(), b.Lo()), Select (mask.Hi(), a.Hi(), b.Hi()));
-    else
-      return mask.Val() ? a.Val() : b.Val();
-  }
-
-}
 
 #endif
