@@ -256,7 +256,7 @@ namespace ASC_HPC
   // ****************** Select   *************************************
 
   template <typename T>
-  auto Select (SIMD<mask64,1> mask, T a, T b)
+  auto Select (SIMD<mask64,1> mask, SIMD<T,1> a, SIMD<T,2> b)
   {
     return mask.Val() ? a : b;
   }

@@ -30,8 +30,8 @@ namespace ASC_HPC
     auto Val() const { return val; }
     const double * Ptr() const { return (double*)&val; }
 
-    auto Lo() const { return val[0]; }
-    auto Hi() const { return val[1]; }
+    auto Lo() const { return SIMD<double,1> (val[0]); }
+    auto Hi() const { return SIMD<double,1> (val[1]); }
     double operator[] (int i) const { return val[i]; }
 
     void Store (double * p)
