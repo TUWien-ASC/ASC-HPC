@@ -145,7 +145,7 @@ namespace ASC_HPC
     return ost;
   }
 
-
+  // ********************** Arithmetic operations ********************************
 
   template <typename T, size_t S>
   auto operator+ (SIMD<T,S> a, SIMD<T,S> b) { return SIMD<T,S> (a.Lo()+b.Lo(), a.Hi()+b.Hi()); }
@@ -172,9 +172,9 @@ namespace ASC_HPC
   template <typename T>
   auto FMA(SIMD<T,1> a, SIMD<T,1> b, SIMD<T,1> c)
   { return SIMD<T,1> (a.Val()*b.Val()+c.Val()); }
-  
 
 
+  // ****************** IndexSequence ********************************
   
   template <typename T, size_t S, T first=0>
   class IndexSequence : public SIMD<T,S>
@@ -210,9 +210,6 @@ namespace ASC_HPC
   
 }
   
-#endif
-  
-  
   
 #ifdef __AVX__
 #include "simd_avx.h"
@@ -220,4 +217,60 @@ namespace ASC_HPC
 
 #if defined(__aarch64__) || defined(_M_ARM64)
 #include "simd_arm64.h"
+#endif
+
+
+
+
+namespace ASC_HPC
+{
+
+  // ****************** Horizontal sums *****************************
+
+  inline double HSum(double a) { return a; }
+  
+  template <typename T, size_t S>
+  double HSum (SIMD<T,S> a)
+  {
+    if constexpr (S > 1)
+      return HSum(a.Lo())+HSum(a.Hi());
+    else
+      return a.Val();
+  }
+
+
+  inline SIMD<double,2> HSum(double a0, double a1) { return SIMD<double,2> (a0, a1); }
+  
+  template <typename T, size_t S>
+  auto HSum (SIMD<T,S> a0, SIMD<T,S> a1) -> SIMD<T,2>
+  {
+    if constexpr (S > 1)
+      return HSum(a0.Lo(), a1.Lo())+HSum(a0.Hi(), a1.Hi());
+    else
+      return SIMD<T,2> (a0.Val(), a1.Val());
+  }
+
+
+
+  
+  // ****************** Select   *************************************
+
+  template <typename T>
+  auto Select (SIMD<mask64,1> mask, T a, T b)
+  {
+    return mask.Val() ? a : b;
+  }
+
+  
+  template <typename T, size_t S>
+  auto Select (SIMD<mask64,S> mask, SIMD<T,S> a, SIMD<T,S> b)
+  {
+    if constexpr (S > 1)
+      return SIMD<T,S> ( Select (mask.Lo(), a.Lo(), b.Lo()), Select (mask.Hi(), a.Hi(), b.Hi()));
+    else
+      return mask.Val() ? a.Val() : b.Val();
+  }
+
+}
+
 #endif

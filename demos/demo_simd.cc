@@ -33,6 +33,9 @@ int main()
   cout << "b = " << b << endl;
   cout << "a+b = " << a+b << endl;
 
+  cout << "HSum(a) = " << HSum(a) << endl;
+  cout << "HSum(a,b) = " << HSum(a,b) << endl;
+
   
   auto sequ = IndexSequence<int64_t, 4>();
   cout << "sequ = " << sequ << endl;
@@ -44,4 +47,7 @@ int main()
     SIMD<double,4> sa(&a[0], mask);
     cout << "sa = " << sa << endl;
   }
+
+  cout << "Select(mask, a, b) = " << Select(mask, a,b) << endl;
+  
 }
