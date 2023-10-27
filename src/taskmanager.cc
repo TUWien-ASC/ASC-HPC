@@ -86,7 +86,7 @@ namespace ASC_HPC
     
     std::atomic<int> cnt{0};
 
-    /*
+
     for (size_t i = 0; i < num; i++)
       {
         Task task;
@@ -96,8 +96,8 @@ namespace ASC_HPC
         task.cnt = &cnt;
         queue.enqueue(ptoken, task);
       }
-    */
 
+    /*
     // faster with bulk enqueue (error with gcc-Release)
     Task firsttask;
     firsttask.nr = 0;
@@ -105,7 +105,7 @@ namespace ASC_HPC
     firsttask.pfunc=&func;
     firsttask.cnt = &cnt;
     queue.enqueue_bulk (ptoken, firsttask, num);    
-
+    */
     
     while (cnt < num)
       {
