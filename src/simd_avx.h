@@ -15,6 +15,9 @@ namespace ASC_HPC
     SIMD (__m256d _mask) : mask(_mm256_castpd_si256(_mask)) { ; }
     auto Val() const { return mask; }
     mask64 operator[](size_t i) const { return ( (int64_t*)&mask)[0] != 0; }
+
+    SIMD<mask64, 2> Lo() const { return SIMD<mask64,2>(mask[0], mask[1]); }
+    SIMD<mask64, 2> Hi() const { return SIMD<mask64,2>(mask[2], mask[3]); }
   };
 
 
@@ -37,6 +40,10 @@ namespace ASC_HPC
     static constexpr int Size() { return 4; }
     auto Val() const { return val; }
     const double * Ptr() const { return (double*)&val; }
+    SIMD<double, 2> Lo() const { return SIMD<double,2>(val[0], val[1]); }
+    SIMD<double, 2> Hi() const { return SIMD<double,2>(val[2], val[3]); }
+
+    // better:
     // SIMD<double, 2> Lo() const { return _mm256_extractf128_pd(val, 0); }
     // SIMD<double, 2> Hi() const { return _mm256_extractf128_pd(val, 1); }
     double operator[](size_t i) const { return val[i]; }
