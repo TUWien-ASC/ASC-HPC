@@ -130,7 +130,7 @@ namespace ASC_HPC
     explicit SIMD (T * ptr, SIMD<mask64,1> m)
       : val{ m.Val() ? *ptr : T(0)} { }
 
-    constexpr size_t Size() { return 1; }
+    static constexpr size_t Size() { return 1; }
     const T * Ptr() const { return &val; }    
     T operator[] (size_t i) const { return val; }
   };

@@ -176,8 +176,8 @@ int main()
 
   
 
-  cout << "timing inner product" << endl;
-  constexpr size_t SW=16;
+  constexpr size_t SW=4;
+  cout << "timing inner product 1x" << SW << endl;
   for (size_t n = 16; n <= 1024; n*= 2)
     {
       double * px = new double[n];
@@ -207,8 +207,8 @@ int main()
     }
   
   {
-  cout << "timing inner product2" << endl;
   constexpr size_t SW=16;
+  cout << "timing inner product 2x" << SW << endl;
   for (size_t n = 16; n <= 1024; n*= 2)
     {
       double * px0 = new double[n];
