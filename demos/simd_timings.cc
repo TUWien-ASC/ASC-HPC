@@ -69,7 +69,7 @@ void daxpy2x2 (size_t n, double * px0, double * px1,
 template <size_t SW>
 auto InnerProduct (size_t n, double * px, double * py, size_t dy)
 {
-  SIMD<double,SW> sum;
+  SIMD<double,SW> sum{0.0};
   for (size_t i = 0; i < n; i++)
     {
       // sum += px[i] * SIMD<double,SW>(py+i*dy);
@@ -91,8 +91,8 @@ auto InnerProduct8 (size_t n, double * px, double * py, size_t dy)
 template <size_t SW>
 auto InnerProduct2 (size_t n, double * px0, double * px1, double * py, size_t dy)
 {
-  SIMD<double,SW> sum0;
-  SIMD<double,SW> sum1;
+  SIMD<double,SW> sum0{0.0};
+  SIMD<double,SW> sum1{0.0};
   for (size_t i = 0; i < n; i++)
     {
       // sum += px[i] * SIMD<double,SW>(py+i*dy);
