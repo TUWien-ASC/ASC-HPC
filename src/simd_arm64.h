@@ -63,12 +63,12 @@ namespace ASC_HPC
     auto Hi() const { return SIMD<double,1> (val[1]); }
     double operator[] (int i) const { return val[i]; }
 
-    void Store (double * p)
+    void Store (double * p) const
     {
       vst1q_f64(p, val);
     }
     
-    void Store (double * p, SIMD<mask64,2> mask)
+    void Store (double * p, SIMD<mask64,2> mask) const
     {
       if (mask[0]) p[0] = val[0];
       if (mask[1]) p[1] = val[1];

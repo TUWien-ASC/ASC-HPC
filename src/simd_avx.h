@@ -55,8 +55,8 @@ namespace ASC_HPC
     // SIMD<double, 2> Hi() const { return _mm256_extractf128_pd(val, 1); }
     double operator[](size_t i) const { return val[i]; }
 
-    void Store (double * p) { _mm256_storeu_pd(p, val); }
-    void Store (double * p, SIMD<mask64,4> mask) { _mm256_maskstore_pd(p, mask.Val(), val); }
+    void Store (double * p) const { _mm256_storeu_pd(p, val); }
+    void Store (double * p, SIMD<mask64,4> mask) const { _mm256_maskstore_pd(p, mask.Val(), val); }
   };
   
 
