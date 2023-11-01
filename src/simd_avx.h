@@ -2,6 +2,7 @@
 #define SIMD_AVX_H
 
 #include <immintrin.h>
+#include <array>
 
 
 /*
