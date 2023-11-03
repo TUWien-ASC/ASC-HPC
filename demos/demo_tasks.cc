@@ -38,13 +38,39 @@ int main()
   
   RunParallel(100,  [] (int i, int size)
   {
-    static Timer t("timer two", { 0, 0, 1});
+    static Timer t("one of 100", { 0, 0, 1});
     RegionTimer reg(t);
   });
 
+  {
+    static Timer t("100x10 parallel runs", { 0, 0, 1});
+    RegionTimer reg(t);
+
+    for (int k = 0; k < 100; k++)
+      RunParallel(10,  [] (int i, int size)
+      {
+        ;
+      });
+  }
+
+  
+  {
+    static Timer t("10x10x10 parallel runs", { 0, 0, 1});
+    RegionTimer reg(t);
+
+    for (int k = 0; k < 10; k++)
+      RunParallel(10, [] (int i, int size)
+      {
+        RunParallel (10, [] (int j, int size)
+        {
+        });
+      });
+  }
+
+  
   RunParallel(1000,  [] (int i, int size)
   {
-    static Timer t("timer 3", { 1, 0, 0});
+    static Timer t("timer 1000 tasks", { 1, 0, 0});
     RegionTimer reg(t);
   });
 
