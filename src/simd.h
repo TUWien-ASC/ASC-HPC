@@ -122,9 +122,7 @@ namespace ASC_HPC
     SIMD() = default;
     SIMD(T _val) : val(_val) { }
     SIMD(std::array<T,1> vals) : val(vals[0]) { }
-
-    explicit SIMD (T * ptr)
-      : val{*ptr} { } 
+    explicit SIMD (T * ptr) : val{*ptr} { } 
 
     auto Val() const { return val; }
     
@@ -134,6 +132,9 @@ namespace ASC_HPC
     static constexpr size_t Size() { return 1; }
     const T * Ptr() const { return &val; }    
     T operator[] (size_t i) const { return val; }
+
+    void Store (T * ptr) const { *ptr = val; }
+    void Store (T * ptr, SIMD<mask64,1> m) const { if (m.Val()) *ptr = val; }
   };
 
 
