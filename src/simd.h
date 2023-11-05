@@ -247,10 +247,6 @@ namespace ASC_HPC
 #include "simd_avx.h"
 #endif
 
-#ifdef __AVX512F__
-juhu
-#endif
-
 #if defined(__aarch64__) || defined(_M_ARM64)
 #include "simd_arm64.h"
 #endif
