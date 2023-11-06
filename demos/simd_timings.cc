@@ -128,10 +128,9 @@ int main()
         daxpy (n, px, py, 2.8);
       
       auto end = std::chrono::high_resolution_clock::now();
-      double time = std::chrono::duration<double, std::milli>(end-start).count();
+      double time = std::chrono::duration<double, std::nano>(end-start).count();
         
-      cout << "n = " << n << ", time = " << time 
-           << " ms, GFlops = " << (n*runs)/time/1e6
+      cout << "n = " << n << ", time = " << time << " ms, GFlops = " << (n*runs)/time
            << endl;
       
       delete [] py;
@@ -162,10 +161,9 @@ int main()
         daxpy2x2 (n, px0, px1, py0, py1, 0.4, 1.3, 2.5, 2.8);
       
       auto end = std::chrono::high_resolution_clock::now();
-      double time = std::chrono::duration<double, std::milli>(end-start).count();
+      double time = std::chrono::duration<double, std::nano>(end-start).count();
         
-      cout << "n = " << n << "time = " << time 
-           << " ms, GFlops = " << (4*n*runs)/time/1e6
+      cout << "n = " << n << "time = " << time << " ms, GFlops = " << (4*n*runs)/time
            << endl;
       
       delete [] py0;
@@ -196,10 +194,10 @@ int main()
         sum += InnerProduct<SW> (n, px, py, SIMD<double,SW>::Size());
       
       auto end = std::chrono::high_resolution_clock::now();
-      double time = std::chrono::duration<double, std::milli>(end-start).count();
+      double time = std::chrono::duration<double, std::nano>(end-start).count();
       cout << "sum = " << sum;
       cout << ", n = " << n << ", time = " << time 
-           << " ms, GFlops = " << (SIMD<double,SW>::Size()*n*runs)/time/1e6
+           << " ms, GFlops = " << (SIMD<double,SW>::Size()*n*runs)/time
            << endl;
       
       delete [] py;
@@ -234,10 +232,10 @@ int main()
         }
       
       auto end = std::chrono::high_resolution_clock::now();
-      double time = std::chrono::duration<double, std::milli>(end-start).count();
+      double time = std::chrono::duration<double, std::nano>(end-start).count();
       cout << "sum = " << sum;
       cout << ", n = " << n << ", time = " << time 
-           << " ms, GFlops = " << (2*SW*n*runs)/time/1e6
+           << " ms, GFlops = " << (2*SW*n*runs)/time
            << endl;
       
       delete [] py;
