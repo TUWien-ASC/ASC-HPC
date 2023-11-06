@@ -27,6 +27,9 @@ int main()
   {
     RunParallel(6, [i] (int j, int s2)
     {
+      static Timer t("timer nested", {1,0,0});
+      RegionTimer reg(t);
+      
       std::stringstream str;
       str << "nested, i,j = " << i << "," << j << "\n";
       cout << str.str();
