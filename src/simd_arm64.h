@@ -21,13 +21,14 @@ namespace ASC_HPC
     int64x2_t val;
   public:
     SIMD (int64x2_t _val) : val(_val) { };
-    SIMD (SIMD<mask64,1> v0, SIMD<mask64,1> v1) : val{v0.Val(), v1.Val()} { }
+    SIMD (SIMD<mask64,1> v0, SIMD<mask64,1> v1)
+      : val{vcombine_s64(int64x1_t{v0.Val().Val()}, int64x1_t{v1.Val().Val()})} { } 
 
     auto Val() const { return val; }
-    mask64 operator[](size_t i) const { return ( (int64_t*)&val)[0] != 0; }
+    mask64 operator[](size_t i) const { return ( (int64_t*)&val)[i] != 0; }
 
-    SIMD<mask64, 1> Lo() const { return SIMD<mask64,1>(val[0]); }
-    SIMD<mask64, 1> Hi() const { return SIMD<mask64,1>(val[1]); }
+    SIMD<mask64, 1> Lo() const { return SIMD<mask64,1>((*this)[0]); }
+    SIMD<mask64, 1> Hi() const { return SIMD<mask64,1>((*this)[1]); }
     const mask64 * Ptr() const { return (mask64*)&val; }
   };
 

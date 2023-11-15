@@ -35,7 +35,7 @@ namespace ASC_HPC
   public:
     mask64 (bool b)
       : mask{ b ? -1 : 0 } { }
-    // auto Val() const { return mask; }
+    auto Val() const { return mask; }
     operator bool() { return bool(mask); }
   };
   
