@@ -3,8 +3,8 @@
 
 #include <concurrentqueue.h>
 
-#include "taskmanager.h"
-#include "timer.h"
+#include "taskmanager.hpp"
+#include "timer.hpp"
 
 
 namespace ASC_HPC

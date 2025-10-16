@@ -3,7 +3,7 @@
 #include <chrono>
 
 
-#include <simd.h>
+#include <simd.hpp>
 
 using namespace ASC_HPC;
 using namespace std;
@@ -18,12 +18,12 @@ using namespace std;
 void daxpy (size_t n, double * px, double * py, double alpha)
 {
   SIMD<double> simd_alpha(alpha);
-  for (size_t i = 0; i < n; i += SIMD<double>::Size())
+  for (size_t i = 0; i < n; i += SIMD<double>::size())
     {
       SIMD<double> yi(py+i);
       // yi += simd_alpha * SIMD<double> (px+i);
       yi = FMA(simd_alpha, SIMD<double> (px+i), yi);
-      yi.Store(py+i);
+      yi.store(py+i);
     }
 }
 
@@ -38,22 +38,22 @@ void daxpy2x2 (size_t n, double * px0, double * px1,
   SIMD<double> simd_alpha10(alpha10);
   SIMD<double> simd_alpha11(alpha11);  
   
-  for (size_t i = 0; i < n; i += SIMD<double>::Size())
+  for (size_t i = 0; i < n; i += SIMD<double>::size())
     {
       SIMD<double> xi0(px0+i);
       SIMD<double> xi1(px1+i);
-      // (SIMD<double>(py0+i)+simd_alpha00*xi0+simd_alpha01*xi1).Store(py0+i);
-      // (SIMD<double>(py1+i)+simd_alpha10*xi0+simd_alpha11*xi1).Store(py1+i);
+      // (SIMD<double>(py0+i)+simd_alpha00*xi0+simd_alpha01*xi1).store(py0+i);
+      // (SIMD<double>(py1+i)+simd_alpha10*xi0+simd_alpha11*xi1).store(py1+i);
 
       SIMD<double> yi0(py0+i);
       yi0 = FMA(simd_alpha00, xi0, yi0);
       yi0 = FMA(simd_alpha01, xi1, yi0);
-      yi0.Store(py0+i);
+      yi0.store(py0+i);
       
       SIMD<double> yi1(py1+i);
       yi1 = FMA(simd_alpha10, xi0, yi1);
       yi1 = FMA(simd_alpha11, xi1, yi1);
-      yi1.Store(py1+i);
+      yi1.store(py1+i);
     }
 }
 
@@ -179,25 +179,25 @@ int main()
   for (size_t n = 16; n <= 1024; n*= 2)
     {
       double * px = new double[n];
-      double * py = new double[n*SIMD<double,SW>::Size()];
+      double * py = new double[n*SIMD<double,SW>::size()];
       for (size_t i = 0; i < n; i++)
         px[i] = i;
-      for (size_t i = 0; i < n*SIMD<double,SW>::Size(); i++)
+      for (size_t i = 0; i < n*SIMD<double,SW>::size(); i++)
         py[i] = 2;
   
       auto start = std::chrono::high_resolution_clock::now();
 
-      size_t runs = size_t (1e8 / (n*SIMD<double,SW>::Size())) + 1;
+      size_t runs = size_t (1e8 / (n*SIMD<double,SW>::size())) + 1;
 
       SIMD<double,SW> sum{0.0};
       for (size_t i = 0; i < runs; i++)
-        sum += InnerProduct<SW> (n, px, py, SIMD<double,SW>::Size());
+        sum += InnerProduct<SW> (n, px, py, SIMD<double,SW>::size());
       
       auto end = std::chrono::high_resolution_clock::now();
       double time = std::chrono::duration<double>(end-start).count();
       cout << "sum = " << sum;
       cout << ", n = " << n << ", time = " << time 
-           << " s, GFlops = " << (SIMD<double,SW>::Size()*n*runs)/time*1e-9
+           << " s, GFlops = " << (SIMD<double,SW>::size()*n*runs)/time*1e-9
            << endl;
       
       delete [] py;

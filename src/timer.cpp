@@ -1,7 +1,7 @@
 #include <fstream>
 
-#include "timer.h"
-#include "taskmanager.h"
+#include "timer.hpp"
+#include "taskmanager.hpp"
 
 
 namespace ASC_HPC

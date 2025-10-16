@@ -2,8 +2,8 @@
 #include <sstream>
 
 
-#include <taskmanager.h>
-#include <timer.h>
+#include <taskmanager.hpp>
+#include <timer.hpp>
 
 using namespace ASC_HPC;
 using std::cout, std::endl;

@@ -1,5 +1,5 @@
-#ifndef SIMD_H
-#define SIMD_H
+#ifndef SIMD_HPP
+#define SIMD_HPP
 
 #include<iostream>
 #include<string>
@@ -21,7 +21,7 @@ namespace ASC_HPC
   template <typename T, size_t S = DefaultSimdSizeBytes/sizeof(T)> class SIMD;
   
   
-  constexpr size_t LargestPowerOfTwo (size_t x)
+  constexpr size_t largestPowerOfTwo (size_t x)
   {
     size_t y = 1;
     while (2*y <= x) y *= 2;
@@ -31,12 +31,12 @@ namespace ASC_HPC
   
   class mask64
   {
-    int64_t mask;
+    int64_t m_mask;
   public:
     mask64 (bool b)
-      : mask{ b ? -1 : 0 } { }
-    auto Val() const { return mask; }
-    operator bool() { return bool(mask); }
+      : m_mask{ b ? -1 : 0 } { }
+    auto val() const { return m_mask; }
+    operator bool() { return bool(m_mask); }
   };
   
   inline std::ostream & operator<< (std::ostream & ost, mask64 m)
@@ -64,23 +64,23 @@ namespace ASC_HPC
   class SIMD
   {
   protected:
-    static constexpr size_t S1 = LargestPowerOfTwo(S-1);
+    static constexpr size_t S1 = largestPowerOfTwo(S-1);
     static constexpr size_t S2 = S-S1;
 
-    SIMD<T,S1> lo;
-    SIMD<T,S2> hi;
+    SIMD<T,S1> m_lo;
+    SIMD<T,S2> m_hi;
   public:
     SIMD() = default;
 
     explicit SIMD (T val)
-      : lo(val), hi(val) { }
+      : m_lo(val), m_hi(val) { }
 
-    explicit SIMD (SIMD<T,S1> _lo, SIMD<T,S2> _hi)
-      : lo(_lo), hi(_hi) { }
+    explicit SIMD (SIMD<T,S1> lo, SIMD<T,S2> hi)
+      : m_lo(lo), m_hi(hi) { }
     
     explicit SIMD (std::array<T, S> arr)
-      : lo(detail::array_range<0, S1>(arr)),
-        hi(detail::array_range<S1, S>(arr))
+      : m_lo(detail::array_range<0, S1>(arr)),
+        m_hi(detail::array_range<S1, S>(arr))
       {}
 
     template <typename ...T2>
@@ -88,27 +88,27 @@ namespace ASC_HPC
       : SIMD(std::array<T, S>{val0, vals...}) { }
 
     explicit SIMD (T * ptr)
-      : lo(ptr), hi(ptr+S1) { }
+      : m_lo(ptr), m_hi(ptr+S1) { }
     
-    explicit SIMD (T * ptr, SIMD<mask64,S> m)
-      : lo(ptr, m.Lo()), hi(ptr+S1, m.Hi()) { }
+    explicit SIMD (T * ptr, SIMD<mask64,S> mask)
+      : m_lo(ptr, mask.lo()), m_hi(ptr+S1, mask.hi()) { }
     
     
-    static constexpr int Size() { return S; }    
-    auto & Lo() { return lo; }
-    auto & Hi() { return hi; }
+    static constexpr int size() { return S; }    
+    auto & lo() { return m_lo; }
+    auto & hi() { return m_hi; }
 
-    const T * Ptr() const { return lo.Ptr(); }
-    T operator[] (size_t i) const { return Ptr()[i]; }
+    const T * ptr() const { return m_lo.ptr(); }
+    T operator[] (size_t i) const { return ptr()[i]; }
 
-    void Store (T * ptr) const {
-      lo.Store(ptr);
-      hi.Store(ptr+S1);
+    void store (T * ptr) const {
+      m_lo.store(ptr);
+      m_hi.store(ptr+S1);
     }
 
-    void Store (T * ptr, SIMD<mask64,S> m) const {
-      lo.Store(ptr, m.Lo());
-      hi.Store(ptr+S1, m.Hi());
+    void store (T * ptr, SIMD<mask64,S> mask) const {
+      m_lo.store(ptr, mask.lo());
+      m_hi.store(ptr+S1, mask.hi());
     }
   };
 
@@ -117,24 +117,24 @@ namespace ASC_HPC
   template <typename T>
   class SIMD<T,1>
   {
-    T val;
+    T m_val;
   public:
     SIMD() = default;
-    SIMD(T _val) : val(_val) { }
-    SIMD(std::array<T,1> vals) : val(vals[0]) { }
-    explicit SIMD (T * ptr) : val{*ptr} { } 
+    SIMD(T val) : m_val(val) { }
+    SIMD(std::array<T,1> vals) : m_val(vals[0]) { }
+    explicit SIMD (T * ptr) : m_val{*ptr} { } 
 
-    auto Val() const { return val; }
+    auto val() const { return m_val; }
     
-    explicit SIMD (T * ptr, SIMD<mask64,1> m)
-      : val{ m.Val() ? *ptr : T(0)} { }
+    explicit SIMD (T * ptr, SIMD<mask64,1> mask)
+      : m_val{ mask.val() ? *ptr : T(0)} { }
 
-    static constexpr size_t Size() { return 1; }
-    const T * Ptr() const { return &val; }    
-    T operator[] (size_t i) const { return val; }
+    static constexpr size_t size() { return 1; }
+    const T * ptr() const { return &m_val; }    
+    T operator[] (size_t i) const { return m_val; }
 
-    void Store (T * ptr) const { *ptr = val; }
-    void Store (T * ptr, SIMD<mask64,1> m) const { if (m.Val()) *ptr = val; }
+    void store (T * ptr) const { *ptr = m_val; }
+    void store (T * ptr, SIMD<mask64,1> mask) const { if (mask.val()) *ptr = m_val; }
   };
 
 
@@ -150,49 +150,49 @@ namespace ASC_HPC
   // ********************** Arithmetic operations ********************************
 
   template <typename T, size_t S>
-  auto operator+ (SIMD<T,S> a, SIMD<T,S> b) { return SIMD<T,S> (a.Lo()+b.Lo(), a.Hi()+b.Hi()); }
+  auto operator+ (SIMD<T,S> a, SIMD<T,S> b) { return SIMD<T,S> (a.lo()+b.lo(), a.hi()+b.hi()); }
   template <typename T>
-  auto operator+ (SIMD<T,1> a, SIMD<T,1> b) { return SIMD<T,1> (a.Val()+b.Val()); }
+  auto operator+ (SIMD<T,1> a, SIMD<T,1> b) { return SIMD<T,1> (a.val()()+b.val()()); }
 
 
   template <typename T, size_t S>
-  auto operator* (SIMD<T,S> a, SIMD<T,S> b) { return SIMD<T,S> (a.Lo()*b.Lo(), a.Hi()*b.Hi()); }
+  auto operator* (SIMD<T,S> a, SIMD<T,S> b) { return SIMD<T,S> (a.lo()*b.lo(), a.hi()*b.hi()); }
   template <typename T>
-  auto operator* (SIMD<T,1> a, SIMD<T,1> b) { return SIMD<T,1> (a.Val()*b.Val()); }
+  auto operator* (SIMD<T,1> a, SIMD<T,1> b) { return SIMD<T,1> (a.val()()*b.val()()); }
   
   template <typename T, size_t S>
-  auto operator* (double a, SIMD<T,S> b) { return SIMD<T,S> (a*b.Lo(), a*b.Hi()); }
+  auto operator* (double a, SIMD<T,S> b) { return SIMD<T,S> (a*b.lo(), a*b.hi()); }
   template <typename T>
-  auto operator* (double a, SIMD<T,1> b) { return SIMD<T,1> (a*b.Val()); }
+  auto operator* (double a, SIMD<T,1> b) { return SIMD<T,1> (a*b.val()()); }
 
   template <typename T, size_t S>
   auto operator+= (SIMD<T,S> & a, SIMD<T,S> b) { a = a+b; return a; }
   
   template <typename T, size_t S>
   auto FMA(SIMD<T,S> a, SIMD<T,S> b, SIMD<T,S> c)
-  { return SIMD<T,S> (FMA(a.Lo(),b.Lo(),c.Lo()), FMA(a.Hi(),b.Hi(),c.Hi())); }    
+  { return SIMD<T,S> (FMA(a.lo(),b.lo(),c.lo()), FMA(a.hi(),b.hi(),c.hi())); }    
   template <typename T>
   auto FMA(SIMD<T,1> a, SIMD<T,1> b, SIMD<T,1> c)
-  { return SIMD<T,1> (a.Val()*b.Val()+c.Val()); }
+  { return SIMD<T,1> (a.val()()*b.val()()+c.val()()); }
 
 
 
   // ****************** Horizontal sums *****************************
   
   template <typename T, size_t S>
-  auto HSum (SIMD<T,S> a) { return HSum(a.Lo())+HSum(a.Hi()); }
+  auto HSum (SIMD<T,S> a) { return HSum(a.lo())+HSum(a.hi()); }
 
   template <typename T>
-  auto HSum (SIMD<T,1> a) { return a.Val(); }
+  auto HSum (SIMD<T,1> a) { return a.val(); }
   
   
   template <typename T, size_t S>
   auto HSum (SIMD<T,S> a0, SIMD<T,S> a1)
-  { return HSum(a0.Lo(), a1.Lo())+HSum(a0.Hi(), a1.Hi()); }
+  { return HSum(a0.lo(), a1.lo())+HSum(a0.hi(), a1.hi()); }
 
   template <typename T>
   auto HSum(SIMD<T,1> a0, SIMD<T,1> a1)
-  { return SIMD<T,2> (a0.Val(), a1.Val()); }
+  { return SIMD<T,2> (a0.val()(), a1.val()()); }
 
 
   
@@ -200,12 +200,12 @@ namespace ASC_HPC
 
   template <typename T>
   auto Select (SIMD<mask64,1> mask, SIMD<T,1> a, SIMD<T,1> b)
-  { return mask.Val() ? a : b; }
+  { return mask.val() ? a : b; }
   
   template <typename T, size_t S>
   auto Select (SIMD<mask64,S> mask, SIMD<T,S> a, SIMD<T,S> b)
-  { return SIMD<T,S> (Select (mask.Lo(), a.Lo(), b.Lo()),
-                      Select (mask.Hi(), a.Hi(), b.Hi())); }
+  { return SIMD<T,S> (Select (mask.lo(), a.lo(), b.lo()),
+                      Select (mask.hi(), a.hi(), b.hi())); }
 
   // ****************** IndexSequence ********************************
   
@@ -230,11 +230,11 @@ namespace ASC_HPC
 
   template <typename T, size_t S>
   auto operator>= (SIMD<T,S> a, SIMD<T,S> b)
-  { return SIMD<mask64,S>(a.Lo()>=b.Lo(), a.Hi()>=b.Hi()); }
+  { return SIMD<mask64,S>(a.lo()>=b.lo(), a.hi()>=b.hi()); }
 
   template <typename T>
   auto operator>= (SIMD<T,1> a, SIMD<T,1> b)
-  { return SIMD<mask64,1>(a.Val()>=b.Val()); }
+  { return SIMD<mask64,1>(a.val()>=b.val()); }
 
   template <typename TA, typename T, size_t S>
   auto operator>= (TA a, const SIMD<T,S> & b)
@@ -244,11 +244,11 @@ namespace ASC_HPC
   
   
 #ifdef __AVX__
-#include "simd_avx.h"
+#include "simd_avx.hpp"
 #endif
 
 #if defined(__aarch64__) || defined(_M_ARM64)
-#include "simd_arm64.h"
+#include "simd_arm64.hpp"
 #endif
 
 

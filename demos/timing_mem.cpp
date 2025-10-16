@@ -5,7 +5,7 @@
 #include <chrono>
 
 
-#include <simd.h>
+#include <simd.hpp>
 
 using namespace ASC_HPC;
 using namespace std;
