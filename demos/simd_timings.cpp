@@ -22,7 +22,7 @@ void daxpy (size_t n, double * px, double * py, double alpha)
     {
       SIMD<double> yi(py+i);
       // yi += simd_alpha * SIMD<double> (px+i);
-      yi = FMA(simd_alpha, SIMD<double> (px+i), yi);
+      yi = fma(simd_alpha, SIMD<double> (px+i), yi);
       yi.store(py+i);
     }
 }
@@ -46,13 +46,13 @@ void daxpy2x2 (size_t n, double * px0, double * px1,
       // (SIMD<double>(py1+i)+simd_alpha10*xi0+simd_alpha11*xi1).store(py1+i);
 
       SIMD<double> yi0(py0+i);
-      yi0 = FMA(simd_alpha00, xi0, yi0);
-      yi0 = FMA(simd_alpha01, xi1, yi0);
+      yi0 = fma(simd_alpha00, xi0, yi0);
+      yi0 = fma(simd_alpha01, xi1, yi0);
       yi0.store(py0+i);
       
       SIMD<double> yi1(py1+i);
-      yi1 = FMA(simd_alpha10, xi0, yi1);
-      yi1 = FMA(simd_alpha11, xi1, yi1);
+      yi1 = fma(simd_alpha10, xi0, yi1);
+      yi1 = fma(simd_alpha11, xi1, yi1);
       yi1.store(py1+i);
     }
 }
@@ -73,7 +73,7 @@ auto InnerProduct (size_t n, double * px, double * py, size_t dy)
   for (size_t i = 0; i < n; i++)
     {
       // sum += px[i] * SIMD<double,SW>(py+i*dy);
-      sum = FMA(SIMD<double,SW>(px[i]), SIMD<double,SW>(py+i*dy), sum);
+      sum = fma(SIMD<double,SW>(px[i]), SIMD<double,SW>(py+i*dy), sum);
     }
   return sum;
 }
@@ -97,8 +97,8 @@ auto InnerProduct2 (size_t n, double * px0, double * px1, double * py, size_t dy
     {
       // sum += px[i] * SIMD<double,SW>(py+i*dy);
       SIMD<double,SW> yi(py+i*dy);
-      sum0 = FMA(SIMD<double,SW>(px0[i]), yi, sum0);
-      sum1 = FMA(SIMD<double,SW>(px1[i]), yi, sum1);      
+      sum0 = fma(SIMD<double,SW>(px0[i]), yi, sum0);
+      sum1 = fma(SIMD<double,SW>(px1[i]), yi, sum1);      
     }
   return tuple(sum0, sum1);
 }

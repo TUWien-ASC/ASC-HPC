@@ -83,7 +83,7 @@ namespace ASC_HPC
   inline auto operator* (double a, SIMD<double,2> b) { return SIMD<double,2> (a*b.val()); }    
   
   // a*b+c
-  inline SIMD<double,2> FMA (SIMD<double,2> a, SIMD<double,2> b, SIMD<double,2> c) 
+  inline SIMD<double,2> fma (SIMD<double,2> a, SIMD<double,2> b, SIMD<double,2> c) 
   { return vmlaq_f64(c.val(), a.val(), b.val()); }
 
 

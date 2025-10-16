@@ -64,7 +64,7 @@ namespace ASC_HPC
               }
             
             if (patl)
-              patl -> AddTimeLine(std::move(*timeline));
+              patl -> addTimeLine(std::move(*timeline));
           }));
       }
   }

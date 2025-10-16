@@ -106,7 +106,7 @@ namespace ASC_HPC
   inline auto operator* (double a, SIMD<double,4> b) { return SIMD<double,4>(a)*b; }
   
 #ifdef __FMA__
-  inline SIMD<double,4> FMA (SIMD<double,4> a, SIMD<double,4> b, SIMD<double,4> c)
+  inline SIMD<double,4> fma (SIMD<double,4> a, SIMD<double,4> b, SIMD<double,4> c)
   { return _mm256_fmadd_pd (a.val(), b.val(), c.val()); }
 #endif
 

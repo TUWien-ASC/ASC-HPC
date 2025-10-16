@@ -24,7 +24,7 @@ auto Inner (size_t n, SIMD<double,32> * x, SIMD<double,32> * y)
   SIMD<double,32> sum(0.0);
   for (size_t i = 0; i < n; i++)
     // sum += x[i]*y[i];
-    sum = FMA (x[i], y[i], sum);
+    sum = fma (x[i], y[i], sum);
   return sum;
 }
 
@@ -108,7 +108,7 @@ int main()
 
 
   
-  cout << "sum = " << HSum(sum) << endl;
+  cout << "sum = " << hSum(sum) << endl;
 
   if (false)
   for (size_t n = 1; n <= 2<<22; n*=2)

@@ -7,40 +7,40 @@
 using namespace ASC_HPC;
 using std::cout, std::endl;
 
-auto Func1 (SIMD<double> a, SIMD<double> b)
+auto func1 (SIMD<double> a, SIMD<double> b)
 {
   return a+b;
 }
 
-auto Func2 (SIMD<double,4> a, SIMD<double,4> b)
+auto func2 (SIMD<double,4> a, SIMD<double,4> b)
 {
   return a+3*b;
 }
 
-auto Func3 (SIMD<double,4> a, SIMD<double,4> b, SIMD<double,4> c)
+auto func3 (SIMD<double,4> a, SIMD<double,4> b, SIMD<double,4> c)
 {
-  return FMA(a,b,c);
+  return fma(a,b,c);
 }
 
 
-auto Load (double * p)
+auto load (double * p)
 {
   return SIMD<double,2>(p);
 }
 
-auto LoadMask (double * p, SIMD<mask64,2> m)
+auto loadMask(double *p, SIMD<mask64, 2> m)
 {
   return SIMD<double,2>(p, m);
 }
 
-auto TestSelect (SIMD<mask64,2> m, SIMD<double,2> a, SIMD<double,2> b)
+auto testSelect (SIMD<mask64,2> m, SIMD<double,2> a, SIMD<double,2> b)
 {
-  return Select (m, a, b);
+  return select (m, a, b);
 }
 
-SIMD<double,2> TestHSum (SIMD<double,4> a, SIMD<double,4> b)
+SIMD<double,2> testHSum (SIMD<double,4> a, SIMD<double,4> b)
 {
-  return HSum(a,b);
+  return hSum(a,b);
 }
 
 
@@ -54,8 +54,8 @@ int main()
   cout << "b = " << b << endl;
   cout << "a+b = " << a+b << endl;
 
-  cout << "HSum(a) = " << HSum(a) << endl;
-  cout << "HSum(a,b) = " << HSum(a,b) << endl;
+  cout << "HSum(a) = " << hSum(a) << endl;
+  cout << "HSum(a,b) = " << hSum(a,b) << endl;
 
   
   auto sequ = IndexSequence<int64_t, 4>();
@@ -69,6 +69,6 @@ int main()
     cout << "sa = " << sa << endl;
   }
 
-  cout << "Select(mask, a, b) = " << Select(mask, a,b) << endl;
+  cout << "Select(mask, a, b) = " << select(mask, a,b) << endl;
   
 }

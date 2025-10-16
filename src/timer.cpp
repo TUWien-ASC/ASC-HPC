@@ -18,7 +18,7 @@ namespace ASC_HPC
     : filename(_filename)
   {
     events.reserve(1000*1000);
-    start = GetTimeCounter();
+    start = getTimeCounter();
     start_time = std::chrono::high_resolution_clock::now();
   }
   
@@ -27,7 +27,7 @@ namespace ASC_HPC
     if (filename != "")
       {
         auto end_time = std::chrono::high_resolution_clock::now();
-        auto end = GetTimeCounter();
+        auto end = getTimeCounter();
         auto duration = end_time-start_time;
         
         std::cout << "total time = "
@@ -189,7 +189,7 @@ namespace ASC_HPC
 
   
   
-  void TimeLine :: Print (std::ostream & ost) const
+  void TimeLine :: print (std::ostream & ost) const
   {
     ost << "ending timeline:" << std::endl;
     for (auto e : events)

@@ -169,10 +169,10 @@ namespace ASC_HPC
   auto operator+= (SIMD<T,S> & a, SIMD<T,S> b) { a = a+b; return a; }
   
   template <typename T, size_t S>
-  auto FMA(SIMD<T,S> a, SIMD<T,S> b, SIMD<T,S> c)
-  { return SIMD<T,S> (FMA(a.lo(),b.lo(),c.lo()), FMA(a.hi(),b.hi(),c.hi())); }    
+  auto fma(SIMD<T,S> a, SIMD<T,S> b, SIMD<T,S> c)
+  { return SIMD<T,S> (fma(a.lo(),b.lo(),c.lo()), fma(a.hi(),b.hi(),c.hi())); }    
   template <typename T>
-  auto FMA(SIMD<T,1> a, SIMD<T,1> b, SIMD<T,1> c)
+  auto fma(SIMD<T,1> a, SIMD<T,1> b, SIMD<T,1> c)
   { return SIMD<T,1> (a.val()()*b.val()()+c.val()()); }
 
 
@@ -180,32 +180,32 @@ namespace ASC_HPC
   // ****************** Horizontal sums *****************************
   
   template <typename T, size_t S>
-  auto HSum (SIMD<T,S> a) { return HSum(a.lo())+HSum(a.hi()); }
+  auto hSum (SIMD<T,S> a) { return hSum(a.lo())+hSum(a.hi()); }
 
   template <typename T>
-  auto HSum (SIMD<T,1> a) { return a.val(); }
+  auto hSum (SIMD<T,1> a) { return a.val(); }
   
   
   template <typename T, size_t S>
-  auto HSum (SIMD<T,S> a0, SIMD<T,S> a1)
-  { return HSum(a0.lo(), a1.lo())+HSum(a0.hi(), a1.hi()); }
+  auto hSum (SIMD<T,S> a0, SIMD<T,S> a1)
+  { return hSum(a0.lo(), a1.lo())+hSum(a0.hi(), a1.hi()); }
 
   template <typename T>
-  auto HSum(SIMD<T,1> a0, SIMD<T,1> a1)
-  { return SIMD<T,2> (a0.val()(), a1.val()()); }
+  auto hSum(SIMD<T,1> a0, SIMD<T,1> a1)
+  { return SIMD<T,2> (a0.val(), a1.val()); }
 
 
   
-  // ****************** Select   *************************************
+  // ******************  select   ***********************************
 
   template <typename T>
-  auto Select (SIMD<mask64,1> mask, SIMD<T,1> a, SIMD<T,1> b)
+  auto select (SIMD<mask64,1> mask, SIMD<T,1> a, SIMD<T,1> b)
   { return mask.val() ? a : b; }
   
   template <typename T, size_t S>
-  auto Select (SIMD<mask64,S> mask, SIMD<T,S> a, SIMD<T,S> b)
-  { return SIMD<T,S> (Select (mask.lo(), a.lo(), b.lo()),
-                      Select (mask.hi(), a.hi(), b.hi())); }
+  auto select (SIMD<mask64,S> mask, SIMD<T,S> a, SIMD<T,S> b)
+  { return SIMD<T,S> (select (mask.lo(), a.lo(), b.lo()),
+                      select (mask.hi(), a.hi(), b.hi())); }
 
   // ****************** IndexSequence ********************************
   

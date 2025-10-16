@@ -33,7 +33,7 @@ namespace ASC_HPC
 {
 
 
-  inline size_t GetTimeCounter() 
+  inline size_t getTimeCounter() 
   {
 #if defined(__APPLE__)
     return mach_absolute_time();
@@ -88,18 +88,18 @@ namespace ASC_HPC
     TimeLine(TimeLine&&) = default;
     ~TimeLine();
     
-    void Add (Event event)
+    void add (Event event)
     {
       events.push_back(event);
     }
 
-    void AddTimeLine (TimeLine sub)
+    void addTimeLine (TimeLine sub)
     {
       std::lock_guard<std::mutex> lock(timeline_mutex);      
       subtl.push_back(std::move(sub));
     }
 
-    void Print (std::ostream & ost) const;
+    void print (std::ostream & ost) const;
   };
   
   extern thread_local std::unique_ptr<TimeLine> timeline;
@@ -120,16 +120,16 @@ namespace ASC_HPC
       cols.push_back(col);
     }
 
-    void Start()
+    void start()
     {
       if (timeline)
-        timeline->Add (Event{GetTimeCounter(), nr, 0});
+        timeline->add (Event{getTimeCounter(), nr, 0});
     }
 
-    void Stop()
+    void stop()
     {
       if (timeline)
-        timeline->Add(Event{GetTimeCounter(), nr, 1});
+        timeline->add(Event{getTimeCounter(), nr, 1});
     }
     friend TimeLine;
   };
@@ -141,11 +141,11 @@ namespace ASC_HPC
   public:
     RegionTimer (Timer & _t) : t(_t)
     {
-      t.Start();
+      t.start();
     }
     ~RegionTimer ()
     {
-      t.Stop();
+      t.stop();
     }
   };
 
