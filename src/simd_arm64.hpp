@@ -88,10 +88,10 @@ namespace ASC_HPC
 
 
 
-  inline SIMD<double,2> Select (SIMD<mask64,2> mask, SIMD<double,2> b, SIMD<double,2> c)
+  inline SIMD<double,2> select (SIMD<mask64,2> mask, SIMD<double,2> b, SIMD<double,2> c)
   { return vbslq_f64(mask.val(), b.val(), c.val()); }
   
-  inline SIMD<double,2> HSum (SIMD<double,2> a, SIMD<double,2> b)
+  inline SIMD<double,2> hSum (SIMD<double,2> a, SIMD<double,2> b)
   { return vpaddq_f64(a.val(), b.val()); }
   
 }
