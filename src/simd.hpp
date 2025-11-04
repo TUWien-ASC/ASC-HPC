@@ -152,18 +152,18 @@ namespace ASC_HPC
   template <typename T, size_t S>
   auto operator+ (SIMD<T,S> a, SIMD<T,S> b) { return SIMD<T,S> (a.lo()+b.lo(), a.hi()+b.hi()); }
   template <typename T>
-  auto operator+ (SIMD<T,1> a, SIMD<T,1> b) { return SIMD<T,1> (a.val()()+b.val()()); }
+  auto operator+ (SIMD<T,1> a, SIMD<T,1> b) { return SIMD<T,1> (a.val()+b.val()); }
 
 
   template <typename T, size_t S>
   auto operator* (SIMD<T,S> a, SIMD<T,S> b) { return SIMD<T,S> (a.lo()*b.lo(), a.hi()*b.hi()); }
   template <typename T>
-  auto operator* (SIMD<T,1> a, SIMD<T,1> b) { return SIMD<T,1> (a.val()()*b.val()()); }
+  auto operator* (SIMD<T,1> a, SIMD<T,1> b) { return SIMD<T,1> (a.val()*b.val()); }
   
   template <typename T, size_t S>
   auto operator* (double a, SIMD<T,S> b) { return SIMD<T,S> (a*b.lo(), a*b.hi()); }
   template <typename T>
-  auto operator* (double a, SIMD<T,1> b) { return SIMD<T,1> (a*b.val()()); }
+  auto operator* (double a, SIMD<T,1> b) { return SIMD<T,1> (a*b.val()); }
 
   template <typename T, size_t S>
   auto operator+= (SIMD<T,S> & a, SIMD<T,S> b) { a = a+b; return a; }
@@ -173,7 +173,7 @@ namespace ASC_HPC
   { return SIMD<T,S> (fma(a.lo(),b.lo(),c.lo()), fma(a.hi(),b.hi(),c.hi())); }    
   template <typename T>
   auto fma(SIMD<T,1> a, SIMD<T,1> b, SIMD<T,1> c)
-  { return SIMD<T,1> (a.val()()*b.val()()+c.val()()); }
+  { return SIMD<T,1> (a.val()*b.val()+c.val()); }
 
 
 

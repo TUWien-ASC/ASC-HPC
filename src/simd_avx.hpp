@@ -70,7 +70,7 @@ namespace ASC_HPC
   public:
     SIMD () = default;
     SIMD (const SIMD &) = default;
-    SIMD(int64_t val) : m_val{_mm256_set1_epi64x(_val)} {};
+    SIMD(int64_t val) : m_val{_mm256_set1_epi64x(val)} {};
     SIMD(__m256i val) : m_val{val} {};
     SIMD (int64_t v0, int64_t v1, int64_t v2, int64_t v3) : m_val{_mm256_set_epi64x(v3,v2,v1,v0) } { } 
     SIMD (SIMD<int64_t,2> v0, SIMD<int64_t,2> v1) : SIMD(v0[0], v0[1], v1[0], v1[1]) { }  // can do better !
