@@ -205,7 +205,7 @@ int main()
     }
   
   {
-  constexpr size_t SW=16;
+  constexpr size_t SW=4;
   cout << "timing inner product 2x" << SW << endl;
   for (size_t n = 16; n <= 1024; n*= 2)
     {
