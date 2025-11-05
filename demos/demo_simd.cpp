@@ -69,6 +69,6 @@ int main()
     cout << "sa = " << sa << endl;
   }
 
-  cout << "Select(mask, a, b) = " << select(mask, a,b) << endl;
+  cout << "select(mask, a, b) = " << select(mask, a,b) << endl;
   
 }
