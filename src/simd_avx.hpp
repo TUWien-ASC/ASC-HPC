@@ -104,7 +104,25 @@ namespace ASC_HPC
   
   inline auto operator* (SIMD<double,4> a, SIMD<double,4> b) { return SIMD<double,4> (_mm256_mul_pd(a.val(), b.val())); }
   inline auto operator* (double a, SIMD<double,4> b) { return SIMD<double,4>(a)*b; }
-  
+
+  void transpose (SIMD<double,4> a0, SIMD<double,4> a1, SIMD<double,4> a2, SIMD<double,4> a3,
+                  SIMD<double,4> &b0, SIMD<double,4> &b1, SIMD<double,4> &b2, SIMD<double,4> &b3) {
+    // unpacklo takes the lower two doubles from each simd and interleaves them
+    // interleaving means alternating elements from each input
+    __m256d t0 = _mm256_unpacklo_pd (a0.val(), a1.val()); // t0 = a0[0], a1[0], a0[1], a1[1]
+    __m256d t1 = _mm256_unpackhi_pd (a0.val(), a1.val()); // t1 = a0[2], a1[2], a0[3], a1[3]
+    __m256d t2 = _mm256_unpacklo_pd (a2.val(), a3.val()); // t2 = a2[0], a3[0], a2[1], a3[1]
+    __m256d t3 = _mm256_unpackhi_pd (a2.val(), a3.val()); // t3 = a2[2], a3[2], a2[3], a3[3]
+
+    // permute2f128 selects 128-bit lanes from two input simds and combines them according to the control mask        
+    // 0x20 = 0010 0000  = select low 128 from first input, low 128 from second input
+    // 0x31 = 0011 0001  = select high 128 from first input, high 128 from second input        
+    b0 = SIMD<double,4> (_mm256_permute2f128_pd(t0, t2, 0x20)); // low 128 from t0, low 128 from t2
+    b1 = SIMD<double,4> (_mm256_permute2f128_pd(t1, t3, 0x20)); // low 128 from t1, low 128 from t3
+    b2 = SIMD<double,4> (_mm256_permute2f128_pd(t0, t2, 0x31)); // high 128 from t0, high 128 from t2
+    b3 = SIMD<double,4> (_mm256_permute2f128_pd(t1, t3, 0x31)); // high 128 from t1, high 128 from t3
+  }
+
 #ifdef __FMA__
   inline SIMD<double,4> fma (SIMD<double,4> a, SIMD<double,4> b, SIMD<double,4> c)
   { return _mm256_fmadd_pd (a.val(), b.val(), c.val()); }

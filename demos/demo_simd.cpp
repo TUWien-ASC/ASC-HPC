@@ -48,27 +48,21 @@ SIMD<double,2> testHSum (SIMD<double,4> a, SIMD<double,4> b)
 int main()
 {
   SIMD<double,4> a(1.,2.,3.,4.);
-  SIMD<double,4> b(1.0);
-  
-  cout << "a = " << a << endl;
-  cout << "b = " << b << endl;
-  cout << "a+b = " << a+b << endl;
+  SIMD<double,4> b(5.,6.,7.,8.);
+  SIMD<double,4> c(9.,10.,11.,12.);
+  SIMD<double,4> d(13.,14.,15.,16.);
 
-  cout << "HSum(a) = " << hSum(a) << endl;
-  cout << "HSum(a,b) = " << hSum(a,b) << endl;
+  SIMD<double,4> at, bt, ct, dt;
+  transpose (a, b, c, d, at, bt, ct, dt);
 
-  
-  auto sequ = IndexSequence<int64_t, 4>();
-  cout << "sequ = " << sequ << endl;
-  auto mask = (2 >= sequ);
-  cout << "2 >= " << sequ << " = " << mask << endl;
-
-  {
-    double a[] = { 10, 10, 10, 10 };
-    SIMD<double,4> sa(&a[0], mask);
-    cout << "sa = " << sa << endl;
-  }
-
-  cout << "select(mask, a, b) = " << select(mask, a,b) << endl;
+  std::cout << "a: " << a << "\n";
+  std::cout << "b: " << b << "\n";
+  std::cout << "c: " << c << "\n";
+  std::cout << "d: " << d << "\n";
+  std::cout << "---- transposed ----" << "\n";
+  std::cout << "at: " << at << "\n";
+  std::cout << "bt: " << bt << "\n";
+  std::cout << "ct: " << ct << "\n";
+  std::cout << "dt: " << dt << "\n";
   
 }
