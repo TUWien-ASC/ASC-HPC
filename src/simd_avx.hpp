@@ -97,14 +97,51 @@ namespace ASC_HPC
   };
   
 
+  // ****************** optimized select   ***********************************
+  inline SIMD<double,4> select (SIMD<mask64,4> m, SIMD<double,4> t, SIMD<double,4> f)
+  {
+    // blendv selects from the second arg when mask bit = 0, and from the first when mask bit != 0
+    return SIMD<double,4>(_mm256_blendv_pd(f.val(), t.val(), _mm256_castsi256_pd(m.val())));
+  }
 
-  
+  inline SIMD<int64_t,4> select (SIMD<mask64,4> m, SIMD<int64_t,4> t, SIMD<int64_t,4> f)
+  {
+    __m256i mv  = m.val();
+    __m256i tv  = t.val();
+    __m256i fv  = f.val();
+    __m256i res = _mm256_or_si256(_mm256_and_si256(tv, mv),
+                                  _mm256_andnot_si256(mv, fv));
+    return SIMD<int64_t,4>(res);
+  }
+
+  // ****************** optimized min / max  ***********************************
+  inline SIMD<double,4> min (SIMD<double,4> a, SIMD<double,4> b) {
+    return SIMD<double,4>(_mm256_min_pd(a.val(), b.val()));
+  }
+  inline SIMD<double,4> max (SIMD<double,4> a, SIMD<double,4> b) {
+    return SIMD<double,4>(_mm256_max_pd(a.val(), b.val()));
+  }
+
+  inline SIMD<int64_t,4> min (SIMD<int64_t,4> a, SIMD<int64_t,4> b) {
+    __m256i mask = _mm256_cmpgt_epi64(a.val(), b.val());
+    return select(SIMD<mask64,4>(mask), b, a);
+  }
+  inline SIMD<int64_t,4> max (SIMD<int64_t,4> a, SIMD<int64_t,4> b) {
+    __m256i mask = _mm256_cmpgt_epi64(a.val(), b.val());
+    return select(SIMD<mask64,4>(mask), a, b);
+  }
+
+
+  // ******************  optmized operators  ***********************************
   inline auto operator+ (SIMD<double,4> a, SIMD<double,4> b) { return SIMD<double,4> (_mm256_add_pd(a.val(), b.val())); }
   inline auto operator- (SIMD<double,4> a, SIMD<double,4> b) { return SIMD<double,4> (_mm256_sub_pd(a.val(), b.val())); }
   
   inline auto operator* (SIMD<double,4> a, SIMD<double,4> b) { return SIMD<double,4> (_mm256_mul_pd(a.val(), b.val())); }
   inline auto operator* (double a, SIMD<double,4> b) { return SIMD<double,4>(a)*b; }
 
+
+
+  // ****************** optimized transpose *****************************
   void transpose (SIMD<double,4> a0, SIMD<double,4> a1, SIMD<double,4> a2, SIMD<double,4> a3,
                   SIMD<double,4> &b0, SIMD<double,4> &b1, SIMD<double,4> &b2, SIMD<double,4> &b3) {
     // unpacklo takes the lower two doubles from each simd and interleaves them
@@ -123,19 +160,24 @@ namespace ASC_HPC
     b3 = SIMD<double,4> (_mm256_permute2f128_pd(t1, t3, 0x31)); // high 128 from t1, high 128 from t3
   }
 
+  // ****************** optimized comparisons  ***********************************
+  inline SIMD<mask64,4> operator>= (SIMD<int64_t,4> a , SIMD<int64_t,4> b) { 
+    // there is no a>=b, so we return !(b>a)
+    return  _mm256_xor_si256(_mm256_cmpgt_epi64(b.val(),a.val()),_mm256_set1_epi32(-1)); 
+  }
+  
+  inline auto operator>= (SIMD<double,4> a, SIMD<double,4> b) { 
+    return SIMD<mask64,4>(_mm256_cmp_pd (a.val(), b.val(), _CMP_GE_OQ)); 
+  }
+  
+
+
+
+  // ****************** fused multiply-add  ***********************************
 #ifdef __FMA__
   inline SIMD<double,4> fma (SIMD<double,4> a, SIMD<double,4> b, SIMD<double,4> c)
   { return _mm256_fmadd_pd (a.val(), b.val(), c.val()); }
 #endif
-
-  inline SIMD<mask64,4> operator>= (SIMD<int64_t,4> a , SIMD<int64_t,4> b)
-  { // there is no a>=b, so we return !(b>a)
-    return  _mm256_xor_si256(_mm256_cmpgt_epi64(b.val(),a.val()),_mm256_set1_epi32(-1)); }
-  
-  inline auto operator>= (SIMD<double,4> a, SIMD<double,4> b)
-  { return SIMD<mask64,4>(_mm256_cmp_pd (a.val(), b.val(), _CMP_GE_OQ)); }
-  
-
   
 }
 

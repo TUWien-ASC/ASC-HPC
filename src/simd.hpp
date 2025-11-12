@@ -147,7 +147,7 @@ namespace ASC_HPC
     return ost;
   }
 
-  // ********************** Arithmetic operations ********************************
+  // ********************** generic arithmetic operations ********************************
 
   template <typename T, size_t S>
   auto operator+ (SIMD<T,S> a, SIMD<T,S> b) { return SIMD<T,S> (a.lo()+b.lo(), a.hi()+b.hi()); }
@@ -177,7 +177,7 @@ namespace ASC_HPC
 
 
 
-  // ****************** Horizontal sums *****************************
+  // ****************** generic horizontal sums *****************************
   
   template <typename T, size_t S>
   auto hSum (SIMD<T,S> a) { return hSum(a.lo())+hSum(a.hi()); }
@@ -194,9 +194,22 @@ namespace ASC_HPC
   auto hSum(SIMD<T,1> a0, SIMD<T,1> a1)
   { return SIMD<T,2> (a0.val(), a1.val()); }
 
+  // ******************  generic min-max ***********************************
+  template <typename T, size_t S>
+  inline SIMD<T,S> min (SIMD<T,S> a, SIMD<T,S> b) { return SIMD<T,S>( min(a.lo(), b.lo()), min(a.hi(), b.hi()) ); }
+
+  template <typename T, size_t S>
+  inline SIMD<T,S> max (SIMD<T,S> a, SIMD<T,S> b) { return SIMD<T,S>( max(a.lo(), b.lo()), max(a.hi(), b.hi()) ); }
+
+  template <typename T>
+  inline SIMD<T,1> min (SIMD<T,1> a, SIMD<T,1> b) { return SIMD<T,1>( std::min(a.val(), b.val()) ); } 
+
+  template <typename T>
+  inline SIMD<T,1> max (SIMD<T,1> a, SIMD<T,1> b) { return SIMD<T,1>( std::max(a.val(), b.val()) ); }
+
 
   
-  // ******************  select   ***********************************
+  // ******************  generic select   ***********************************
 
   template <typename T>
   auto select (SIMD<mask64,1> mask, SIMD<T,1> a, SIMD<T,1> b)
@@ -207,7 +220,7 @@ namespace ASC_HPC
   { return SIMD<T,S> (select (mask.lo(), a.lo(), b.lo()),
                       select (mask.hi(), a.hi(), b.hi())); }
 
-  // ****************** IndexSequence ********************************
+  // ****************** generic IndexSequence ********************************
   
   template <typename T, size_t S, T first=0>
   class IndexSequence : public SIMD<T,S>
@@ -227,6 +240,7 @@ namespace ASC_HPC
     IndexSequence() : SIMD<T,1> (first) { }
   };
 
+  // ****************** generic comparisons  ***********************************
 
   template <typename T, size_t S>
   auto operator>= (SIMD<T,S> a, SIMD<T,S> b)
