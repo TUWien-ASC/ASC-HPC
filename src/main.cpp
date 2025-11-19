@@ -10,4 +10,6 @@ int main() {
 
     std::cout << "scalar sin(1.0) = " << s << "\n";
     std::cout << "scalar cos(1.0) = " << c << "\n";
+
+    std::cout << custom_exp(x) << " vs " << std::exp(x) << "\n";
 }

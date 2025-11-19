@@ -9,6 +9,18 @@ namespace ASC_HPC
 
   // ==================  Polynomial coefficients  ==================
 
+  static constexpr double ln2_hi = 0.693359375;            // high part of ln(2)
+  static constexpr double ln2_lo = -2.12194440e-4;         // low part of ln(2)
+
+  static constexpr double exp_coeff[] = {
+      1.9875691500E-4,
+      1.3981999507E-3,
+      8.3334519073E-3,
+      4.1665795894E-2,
+      1.6666665459E-1,
+      5.0000001201E-1
+  };
+
   static constexpr double sincof[] = {
       1.58962301576546568060E-10,
      -2.50507477628578072866E-8,
@@ -137,6 +149,37 @@ namespace ASC_HPC
   {
       auto [s, c] = sincos(x);
       return c;
+  }
+
+  template<typename T>
+  T exp_reduced(T r)
+  {
+      T r2 = r * r;
+
+      // Horner polynomial for exp(r) - 1
+      T p = exp_coeff[0];
+      p = p * r + exp_coeff[1];
+      p = p * r + exp_coeff[2];
+      p = p * r + exp_coeff[3];
+      p = p * r + exp_coeff[4];
+      p = p * r + exp_coeff[5];
+
+      // exp(r) ≈ 1 + r + r² * p
+      return T(1.0) + r + r2 * p;
+  }
+
+  inline double custom_exp(double x)
+  {
+      // reduce: x = n*ln2 + r
+      double n_f = std::floor(x / ln2_hi + 0.5);
+      int n = int(n_f);
+
+      double r = x - n_f * ln2_hi - n_f * ln2_lo;
+
+      double e = exp_reduced(r);
+
+      // reconstruct: exp(x) = 2^n * exp(r)
+      return std::ldexp(e, n);
   }
 
 } // namespace ASC_HPC
