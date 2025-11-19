@@ -4,6 +4,7 @@
 
 
 #include <simd.hpp>
+#include <simd_bitonic.hpp>
 
 using namespace ASC_HPC;
 using namespace std;
@@ -174,7 +175,7 @@ int main()
 
   
 
-  constexpr size_t SW=4;
+  constexpr size_t SW=12;
   cout << "timing inner product 1x" << SW << endl;
   for (size_t n = 16; n <= 1024; n*= 2)
     {
@@ -205,7 +206,7 @@ int main()
     }
   
   {
-  constexpr size_t SW=4;
+  constexpr size_t SW=12;
   cout << "timing inner product 2x" << SW << endl;
   for (size_t n = 16; n <= 1024; n*= 2)
     {

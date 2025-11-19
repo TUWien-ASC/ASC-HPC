@@ -3,72 +3,26 @@
 
 
 #include <simd.hpp>
+#include <simd_bitonic.hpp>
 
 using namespace ASC_HPC;
 using std::cout, std::endl;
 
-auto func1 (SIMD<double> a, SIMD<double> b)
-{
-  return a+b;
-}
-
-auto func2 (SIMD<double,4> a, SIMD<double,4> b)
-{
-  return a+3*b;
-}
-
-auto func3 (SIMD<double,4> a, SIMD<double,4> b, SIMD<double,4> c)
-{
-  return fma(a,b,c);
-}
-
-
-auto load (double * p)
-{
-  return SIMD<double,2>(p);
-}
-
-auto loadMask(double *p, SIMD<mask64, 2> m)
-{
-  return SIMD<double,2>(p, m);
-}
-
-auto testSelect (SIMD<mask64,2> m, SIMD<double,2> a, SIMD<double,2> b)
-{
-  return select (m, a, b);
-}
-
-SIMD<double,2> testHSum (SIMD<double,4> a, SIMD<double,4> b)
-{
-  return hSum(a,b);
-}
 
 
 
 int main()
 {
-  SIMD<double,4> a(1.,2.,3.,4.);
-  SIMD<double,4> b(1.0);
-  
-  cout << "a = " << a << endl;
-  cout << "b = " << b << endl;
-  cout << "a+b = " << a+b << endl;
+    SIMD<double,5> a(2., 15., 3., 1., 5.);
+    SIMD<double,5> b(13., 7., 8., 4., 6.);
+    SIMD<double,5> c(6., 12., 5., 9., 10.);
+    SIMD<double,5> d(10., 14., 11., 0., 12.);
+    SIMD<double,5>* arr = new SIMD<double,5>[4]{a,b,c,d};
 
-  cout << "HSum(a) = " << hSum(a) << endl;
-  cout << "HSum(a,b) = " << hSum(a,b) << endl;
+    BitonicSort<true>(arr, 4);
 
-  
-  auto sequ = IndexSequence<int64_t, 4>();
-  cout << "sequ = " << sequ << endl;
-  auto mask = (2 >= sequ);
-  cout << "2 >= " << sequ << " = " << mask << endl;
+    for (size_t i = 0; i < 4; i++)
+      cout << "arr[" << i << "] = " << arr[i] << "\n";
 
-  {
-    double a[] = { 10, 10, 10, 10 };
-    SIMD<double,4> sa(&a[0], mask);
-    cout << "sa = " << sa << endl;
-  }
-
-  cout << "select(mask, a, b) = " << select(mask, a,b) << endl;
-  
+    delete[] arr; 
 }
