@@ -182,4 +182,24 @@ namespace ASC_HPC
       return std::ldexp(e, n);
   }
 
+  template<size_t S>
+  inline SIMD<double,S> custom_exp(SIMD<double,S> x)
+  {
+      if constexpr (S == 1)
+      {
+          return SIMD<double,1>( exp( x[0] ) );
+      }
+      else
+      {
+          auto x_lo = x.lo();
+          auto x_hi = x.hi();
+
+          auto e_lo = custom_exp(x_lo);
+          auto e_hi = custom_exp(x_hi);
+
+          return SIMD<double,S>(e_lo, e_hi);
+      }
+  }
+
+
 } // namespace ASC_HPC
